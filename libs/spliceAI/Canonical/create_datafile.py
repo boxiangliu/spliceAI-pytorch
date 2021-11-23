@@ -93,7 +93,7 @@ h5f.create_dataset('SEQ', data=np.asarray(SEQ))
 
 h5f.close()
 
-print("--- %s seconds ---" % (time.time() - start_time))
+print "--- %s seconds ---" % (time.time() - start_time)
 
 ###############################################################################
 
