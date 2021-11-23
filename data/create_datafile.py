@@ -80,7 +80,7 @@ fpr2.close()
 h5f = h5py.File(data_dir + 'datafile' 
                 + '_' + sys.argv[1] + '_' + sys.argv[2]
                 + '.h5', 'w')
-
+breakpoint()
 h5f.create_dataset('NAME', data=np.asarray(NAME))
 h5f.create_dataset('PARALOG', data=np.asarray(PARALOG))
 h5f.create_dataset('CHROM', data=np.asarray(CHROM))
