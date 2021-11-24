@@ -58,12 +58,12 @@ for i in tqdm(range(SEQ.shape[0]//CHUNK_SIZE)):
         if sys.argv[4] == "pytorch":
             assert len(X.shape) == 3
             X = X.transpose((0,2,1))
-
-            assert len(X.shape) == 3
-            Y = Y.transpose((0,2,1))
-
         X_batch.extend(X)
+
         for t in range(1):
+            if sys.argv[4] == "pytorch":
+                assert len(Y[t].shape) == 3
+                Y[t] = Y[t].transpose((0,2,1))
             Y_batch[t].extend(Y[t])
 
     X_batch = np.asarray(X_batch).astype('int8')
