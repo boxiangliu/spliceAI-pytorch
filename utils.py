@@ -40,7 +40,7 @@ def create_datapoints(seq, strand, tx_start, tx_end, jn_start, jn_end):
     # correspond to no splicing, acceptor, donor and missing information
     # respectively. It then calls reformat_data and one_hot_encode
     # and returns X, Y which can be used by Keras models.
-
+    breakpoint()
     seq, strand, tx_start, tx_end = map(lambda x: x.decode('utf-8') 
                                         if isinstance(x, bytes) else x, 
                                         (seq, strand, tx_start, tx_end))
