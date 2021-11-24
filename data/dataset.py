@@ -21,7 +21,6 @@ class H5Dataset(torch.utils.data.Dataset):
                 for idx in range(h5f[k].shape[0]):
                     idx_to_key[idx + num_examples] = (k, idx)
                 num_examples += self.h5f[k].shape[0]
-            else:
 
         assert max(idx_to_key) == num_examples - 1
         return idx_to_key, num_examples
@@ -33,3 +32,7 @@ class H5Dataset(torch.utils.data.Dataset):
         Xk, idx = self.idx_to_key[k]
         Yk = Xk.replace("X", "Y")
         return self.h5f[Xk][idx], self.h5f[Yk][0,idx]
+
+def test_H5Dataset():
+    h5_filename = "data/dataset_train_all.h5"
+    dataset = H5Dataset()
