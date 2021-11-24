@@ -56,8 +56,8 @@ def create_datapoints(seq, strand, tx_start, tx_end, jn_start, jn_end):
     tx_start = int(tx_start)
     tx_end = int(tx_end) 
 
-    jn_start = list(map(lambda x: map(int, re.split(',', x)[:-1]), jn_start))
-    jn_end = list(map(lambda x: map(int, re.split(',', x)[:-1]), jn_end))
+    jn_start = list(map(lambda x: list(map(int, re.split(',', x)[:-1])), jn_start))
+    jn_end = list(map(lambda x: list(map(int, re.split(',', x)[:-1])), jn_end))
 
     if strand == '+':
 
