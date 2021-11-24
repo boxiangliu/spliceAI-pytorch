@@ -23,6 +23,10 @@ bash data/grab_sequence.sh
 # SEQ        # Nucleotide sequence
 python data/create_datafile.py train all
 python data/create_datafile.py test 0
+
+
+python data/create_dataset.py train all
+
 ```
 
 

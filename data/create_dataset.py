@@ -33,6 +33,7 @@ h5f2 = h5py.File(data_dir + 'dataset'
                 + '.h5', 'w')
 
 CHUNK_SIZE = 100
+breakpoint()
 
 for i in range(SEQ.shape[0]//CHUNK_SIZE):
     # Each dataset has CHUNK_SIZE genes
@@ -66,6 +67,6 @@ for i in range(SEQ.shape[0]//CHUNK_SIZE):
 
 h5f2.close()
 
-print "--- %s seconds ---" % (time.time() - start_time)
+print("--- %s seconds ---" % (time.time() - start_time))
 
 ###############################################################################         
