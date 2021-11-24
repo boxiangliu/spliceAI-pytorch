@@ -45,7 +45,7 @@ def create_datapoints(seq, strand, tx_start, tx_end, jn_start, jn_end):
         map(lambda x: x.decode('utf-8') if isinstance(x, bytes) else x, 
             (seq, strand, tx_start, tx_end, jn_start, jn_end))
 
-    seq = 'N'*(CL_max//2) + seq[CL_max//2:-CL_max//2].decode('utf-8') + 'N'*(CL_max//2)
+    seq = 'N'*(CL_max//2) + seq[CL_max//2:-CL_max//2] + 'N'*(CL_max//2)
     # Context being provided on the RNA and not the DNA
 
     seq = seq.upper().replace('A', '1').replace('C', '2')
