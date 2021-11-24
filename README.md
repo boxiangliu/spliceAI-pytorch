@@ -26,8 +26,8 @@ python data/create_datafile.py test 0
 
 
 
-python data/create_dataset.py train all 1
-python data/create_dataset.py test 0 1
+python data/create_dataset.py train all 1 pytorch
+python data/create_dataset.py test 0 1 pytorch
 ```
 
 

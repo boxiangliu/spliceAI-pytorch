@@ -56,8 +56,11 @@ for i in tqdm(range(SEQ.shape[0]//CHUNK_SIZE)):
                                  JN_START[idx], JN_END[idx])
 
         if sys.argv[4] == "pytorch":
-            X = X.transpose(-1,-2)
-            Y = Y.transpose(-1,-2)
+            assert len(X.shape) == 3
+            X = X.transpose((0,2,1))
+
+            assert len(X.shape) == 3
+            Y = Y.transpose((0,2,1))
 
         X_batch.extend(X)
         for t in range(1):
