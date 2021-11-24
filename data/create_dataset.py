@@ -33,7 +33,7 @@ h5f2 = h5py.File(data_dir + 'dataset'
                 + '_' + sys.argv[1] + '_' + sys.argv[2]
                 + '.h5', 'w')
 
-CHUNK_SIZE = int(sys.argv[3])
+CHUNK_SIZE = int(sys.argv[3]) # -1 indicates do not chunk
 
 for i in tqdm(range(SEQ.shape[0]//CHUNK_SIZE)):
     # Each dataset has CHUNK_SIZE genes
@@ -64,6 +64,7 @@ for i in tqdm(range(SEQ.shape[0]//CHUNK_SIZE)):
 
     h5f2.create_dataset('X' + str(i), data=X_batch)
     h5f2.create_dataset('Y' + str(i), data=Y_batch)
+
 
 h5f2.close()
 
