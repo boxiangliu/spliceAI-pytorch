@@ -22,7 +22,7 @@ bash data/grab_sequence.sh
 # JN_END     # Positions where canonical exons start
 # SEQ        # Nucleotide sequence
 python data/create_datafile.py train all
-python create_datafile.py test 0
+python data/create_datafile.py test 0
 ```
 
 

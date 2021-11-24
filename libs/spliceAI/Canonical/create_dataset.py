@@ -32,6 +32,7 @@ h5f2 = h5py.File(data_dir + 'dataset'
                 + '_' + sys.argv[1] + '_' + sys.argv[2]
                 + '.h5', 'w')
 
+breakpoint()
 CHUNK_SIZE = 100
 
 for i in range(SEQ.shape[0]//CHUNK_SIZE):
@@ -66,6 +67,6 @@ for i in range(SEQ.shape[0]//CHUNK_SIZE):
 
 h5f2.close()
 
-print "--- %s seconds ---" % (time.time() - start_time)
+print("--- %s seconds ---" % (time.time() - start_time))
 
 ###############################################################################         
