@@ -16,6 +16,7 @@ start_time = time.time()
 
 assert sys.argv[1] in ['train', 'test', 'all']
 assert sys.argv[2] in ['0', '1', 'all']
+assert sys.argv[4] in ["pytorch", "tf"]
 
 h5f = h5py.File(data_dir + 'datafile'
                 + '_' + sys.argv[1] + '_' + sys.argv[2]
@@ -53,6 +54,10 @@ for i in tqdm(range(SEQ.shape[0]//CHUNK_SIZE)):
         X, Y = create_datapoints(SEQ[idx], STRAND[idx],
                                  TX_START[idx], TX_END[idx],
                                  JN_START[idx], JN_END[idx])
+
+        if sys.argv[4] == "pytorch":
+            X = X.transpose(-1,-2)
+            Y = Y.transpose(-1,-2)
 
         X_batch.extend(X)
         for t in range(1):

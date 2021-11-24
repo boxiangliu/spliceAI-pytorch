@@ -1,0 +1,35 @@
+import torch
+import h5py
+
+
+class H5Dataset(torch.utils.data.Dataset):
+
+    def __init__(self, h5_filename):
+        self.h5_filename = h5_filename
+        self.h5f = h5py.File(self.h5_filename, "r")
+        self.idx_to_key, self.num_examples = self.map_idx_to_key()
+
+    def map_idx_to_key(self):
+
+        num_examples = 0
+        idx_to_key = {}
+
+        for k in sorted(self.h5f.keys(), key=lambda x: int(x[1:])):
+            assert k.startswith("X") or k.startswith("Y")
+
+            if k.startswith("X"):
+                for idx in range(h5f[k].shape[0]):
+                    idx_to_key[idx + num_examples] = (k, idx)
+                num_examples += self.h5f[k].shape[0]
+            else:
+
+        assert max(idx_to_key) == num_examples - 1
+        return idx_to_key, num_examples
+
+    def __len__(self):
+        return self.num_examples
+
+    def __getitem__(self, idx):
+        Xk, idx = self.idx_to_key[k]
+        Yk = Xk.replace("X", "Y")
+        return self.h5f[Xk][idx], self.h5f[Yk][0,idx]
