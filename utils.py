@@ -40,7 +40,7 @@ def create_datapoints(seq, strand, tx_start, tx_end, jn_start, jn_end):
     # correspond to no splicing, acceptor, donor and missing information
     # respectively. It then calls reformat_data and one_hot_encode
     # and returns X, Y which can be used by Keras models.
-
+    breakpoint()
     seq = 'N'*(CL_max//2) + seq[CL_max//2:-CL_max//2] + 'N'*(CL_max//2)
     # Context being provided on the RNA and not the DNA
 
