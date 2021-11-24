@@ -10,6 +10,7 @@ import sys
 import time
 from utils import *
 from constants import *
+from tqdm import tqdm
 
 start_time = time.time()
 
@@ -32,9 +33,9 @@ h5f2 = h5py.File(data_dir + 'dataset'
                 + '_' + sys.argv[1] + '_' + sys.argv[2]
                 + '.h5', 'w')
 
-CHUNK_SIZE = 100
+CHUNK_SIZE = int(sys.argv[3])
 
-for i in range(SEQ.shape[0]//CHUNK_SIZE):
+for i in tqdm(range(SEQ.shape[0]//CHUNK_SIZE)):
     # Each dataset has CHUNK_SIZE genes
     
     if (i+1) == SEQ.shape[0]//CHUNK_SIZE:
