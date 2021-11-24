@@ -81,15 +81,15 @@ h5f = h5py.File(data_dir + 'datafile'
                 + '_' + sys.argv[1] + '_' + sys.argv[2]
                 + '.h5', 'w')
 breakpoint()
-h5f.create_dataset('NAME', data=np.asarray(NAME))
+h5f.create_dataset('NAME', data=np.asarray(NAME, dtype=np.dtype("O")))
 h5f.create_dataset('PARALOG', data=np.asarray(PARALOG))
-h5f.create_dataset('CHROM', data=np.asarray(CHROM))
-h5f.create_dataset('STRAND', data=np.asarray(STRAND))
-h5f.create_dataset('TX_START', data=np.asarray(TX_START))
-h5f.create_dataset('TX_END', data=np.asarray(TX_END))
-h5f.create_dataset('JN_START', data=np.asarray(JN_START))
-h5f.create_dataset('JN_END', data=np.asarray(JN_END))
-h5f.create_dataset('SEQ', data=np.asarray(SEQ)) 
+h5f.create_dataset('CHROM', data=np.asarray(CHROM, dtype=np.dtype("O")))
+h5f.create_dataset('STRAND', data=np.asarray(STRAND, dtype=np.dtype("O")))
+h5f.create_dataset('TX_START', data=np.asarray(TX_START, dtype=np.dtype("O")))
+h5f.create_dataset('TX_END', data=np.asarray(TX_END, dtype=np.dtype("O")))
+h5f.create_dataset('JN_START', data=np.asarray(JN_START, dtype=np.dtype("O")))
+h5f.create_dataset('JN_END', data=np.asarray(JN_END, dtype=np.dtype("O")))
+h5f.create_dataset('SEQ', data=np.asarray(SEQ, dtype=np.dtype("O")))
 
 h5f.close()
 
