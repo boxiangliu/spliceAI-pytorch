@@ -30,6 +30,7 @@ class H5Dataset(torch.utils.data.Dataset):
         return self.num_examples
 
     def __getitem__(self, idx):
+        breakpoint()
         Xk, idx = self.idx_to_key[idx]
         Yk = Xk.replace("X", "Y")
         return self.h5f[Xk][idx], self.h5f[Yk][0, idx]
