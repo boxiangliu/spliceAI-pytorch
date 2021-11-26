@@ -113,14 +113,14 @@ class Trainer(object):
 
         with torch.no_grad():
             for seqs, labels in self.dev_loader:
-
+                breakpoint()
                 seqs = seqs.to(self.device)
                 labels = labels.to(self.device)
 
                 outputs = self.model(seqs)
                 loss = self.loss_fun(outputs, labels)
                 dev_loss_sum += tensor2numpy(loss.sum())
-        breakpoint()
+
         self.summary["dev_loss"] = dev_loss_sum / len(self.dev_data)
         self.model.train()
 
