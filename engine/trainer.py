@@ -117,7 +117,7 @@ class Trainer(object):
                 seqs = seqs.to(self.device)
                 labels = labels.to(self.device)
 
-                outputs = self.model(seqs)
+                outputs = self.model(seqs).mean(axis=1)
                 loss = self.loss_fun(outputs, labels)
                 dev_loss_sum += tensor2numpy(loss.sum())
 
