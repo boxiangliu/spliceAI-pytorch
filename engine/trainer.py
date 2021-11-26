@@ -84,6 +84,7 @@ class Trainer(object):
             self.summary["epoch"] += 1
 
         outputs = self.model(seqs)
+        breakpoint()
         loss = self.loss_fun(outputs, labels).mean()
 
         self.optimizer.zero_grad()
