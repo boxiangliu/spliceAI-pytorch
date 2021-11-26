@@ -167,9 +167,8 @@ class Trainer(object):
                     "state_dict": self.model.state_dict()
                 }, os.path.join(self.cfg.LOGGING.DIR, 'best.ckpt'))
 
-                logging.info("BEST, EPOCH: {}, STEP: {}, LOSS: {}, TIME: {:.2f} s".format(
+                logging.info("BEST, EPOCH: {}, STEP: {}, LOSS: {}".format(
                     self.summary["epoch"],
                     self.summary["step"],
-                    self.summary["dev_loss_best"],
-                    elapsed_time
+                    self.summary["dev_loss_best"]
                 ))
