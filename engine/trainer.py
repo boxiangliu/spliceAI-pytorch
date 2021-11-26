@@ -120,7 +120,7 @@ class Trainer(object):
                 outputs = self.model(seqs)
                 loss = self.loss_fun(outputs, labels)
                 dev_loss_sum += tensor2numpy(loss.sum())
-
+        breakpoint()
         self.summary["dev_loss"] = dev_loss_sum / len(self.dev_data)
         self.model.train()
 
@@ -160,6 +160,7 @@ class Trainer(object):
 
         elif mode == "dev":
             if self.summary["dev_loss"] < self.summary["dev_loss_best"]:
+                self.summary["dev_loss_best"] = self.summary["dev_loss"]
                 torch.save({
                     "epoch": self.summary["epoch"],
                     "step": self.summary["step"],
