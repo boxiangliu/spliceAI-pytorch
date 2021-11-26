@@ -33,7 +33,7 @@ class H5Dataset(torch.utils.data.Dataset):
         Xk, idx = self.idx_to_key[idx]
         Yk = Xk.replace("X", "Y")
         return (torch.from_numpy(self.h5f[Xk][idx]).float(),
-                torch.from_numpy(self.h5f[Yk][0, idx]))
+                torch.from_numpy(self.h5f[Yk][0, idx]).float())
 
 
 def test_H5Dataset():
