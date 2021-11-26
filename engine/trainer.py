@@ -112,8 +112,8 @@ class Trainer(object):
         with torch.no_grad():
             for seqs, labels in self.dev_iter:
 
-                seqs.to(self.device)
-                labels.to(self.device)
+                seqs = seqs.to(self.device)
+                labels = labels.to(self.device)
 
                 outputs = self.model(seqs)
                 loss = self.loss_fun(outputs, labels)
