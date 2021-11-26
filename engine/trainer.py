@@ -8,7 +8,7 @@ import time
 import logging
 import shutil
 import sys
-
+import os
 
 class Trainer(object):
 
