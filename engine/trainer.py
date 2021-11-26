@@ -112,8 +112,7 @@ class Trainer(object):
         dev_loss_sum = 0.0
 
         with torch.no_grad():
-            breakpoint()
-            for seqs, labels in self.dev_loader[:5]:
+            for seqs, labels in self.dev_loader:
 
                 seqs = seqs.to(self.device)
                 labels = labels.to(self.device)
