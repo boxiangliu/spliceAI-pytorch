@@ -15,7 +15,7 @@ PARAMS:
     WORKERS: 2
   EPOCH: 30
 LOGGING:
-  LOG_EVERY: 50
-  SAVE_EVERY: 200
+  LOG_EVERY: 5
+  SAVE_EVERY: 20
   DIR: !join [*ROOT, runs/test/]
 
