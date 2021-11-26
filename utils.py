@@ -8,6 +8,8 @@ import re
 from math import ceil
 from sklearn.metrics import average_precision_score
 from constants import *
+import yaml
+from easydict import EDict as edict
 
 assert CL_max % 2 == 0
 
@@ -27,69 +29,91 @@ OUT_MAP = np.asarray([[1, 0, 0],
 # 2 is for donor and -1 is for padding.
 
 
+def tensor2numpy(input_tensor):
+    # device cuda Tensor to host numpy
+    return input_tensor.cpu().detach().numpy()
+
+
+def load_config(cfg_file):
+    # register the tag handler
+    yaml.add_constructor('!join', join)
+    with open(cfg_file, "r") as f:
+        return edict(yaml.load(f, Loader=yaml.FullLoader))
+
+
+def join(loader, node):
+    seq = loader.construct_sequence(node)
+    return os.path.join(*seq)
+
+
 def ceil_div(x, y):
 
-    return int(ceil(float(x)/y))
+    return int(ceil(float(x) / y))
 
 
 def create_datapoints(seq, strand, tx_start, tx_end, jn_start, jn_end):
     # This function first converts the sequence into an integer array, where
     # A, C, G, T, N are mapped to 1, 2, 3, 4, 0 respectively. If the strand is
-    # negative, then reverse complementing is done. The splice junctions 
-    # are also converted into an array of integers, where 0, 1, 2, -1 
+    # negative, then reverse complementing is done. The splice junctions
+    # are also converted into an array of integers, where 0, 1, 2, -1
     # correspond to no splicing, acceptor, donor and missing information
     # respectively. It then calls reformat_data and one_hot_encode
     # and returns X, Y which can be used by Keras models.
-    seq, strand, tx_start, tx_end = map(lambda x: x.decode('utf-8') 
-                                        if isinstance(x, bytes) else x, 
+    seq, strand, tx_start, tx_end = map(lambda x: x.decode('utf-8')
+                                        if isinstance(x, bytes) else x,
                                         (seq, strand, tx_start, tx_end))
-    jn_start = list(map(lambda x: x.decode('utf-8') if isinstance(x, bytes) else x, jn_start))
-    jn_end = list(map(lambda x: x.decode('utf-8') if isinstance(x, bytes) else x, jn_end))
+    jn_start = list(map(lambda x: x.decode('utf-8')
+                        if isinstance(x, bytes) else x, jn_start))
+    jn_end = list(map(lambda x: x.decode('utf-8')
+                      if isinstance(x, bytes) else x, jn_end))
 
-    seq = 'N'*(CL_max//2) + seq[CL_max//2:-CL_max//2] + 'N'*(CL_max//2)
+    seq = 'N' * (CL_max // 2) + seq[CL_max //
+                                    2:-CL_max // 2] + 'N' * (CL_max // 2)
     # Context being provided on the RNA and not the DNA
 
     seq = seq.upper().replace('A', '1').replace('C', '2')
     seq = seq.replace('G', '3').replace('T', '4').replace('N', '0')
 
     tx_start = int(tx_start)
-    tx_end = int(tx_end) 
+    tx_end = int(tx_end)
 
-    jn_start = list(map(lambda x: list(map(int, re.split(',', x)[:-1])), jn_start))
+    jn_start = list(
+        map(lambda x: list(map(int, re.split(',', x)[:-1])), jn_start))
     jn_end = list(map(lambda x: list(map(int, re.split(',', x)[:-1])), jn_end))
 
     if strand == '+':
 
         X0 = np.asarray(list(map(int, list(seq))))
-        Y0 = [-np.ones(tx_end-tx_start+1) for t in range(1)]
+        Y0 = [-np.ones(tx_end - tx_start + 1) for t in range(1)]
 
         for t in range(1):
-            
+
             if len(jn_start[t]) > 0:
-                Y0[t] = np.zeros(tx_end-tx_start+1)
+                Y0[t] = np.zeros(tx_end - tx_start + 1)
                 for c in jn_start[t]:
                     if tx_start <= c <= tx_end:
-                        Y0[t][c-tx_start] = 2
+                        Y0[t][c - tx_start] = 2
                 for c in jn_end[t]:
                     if tx_start <= c <= tx_end:
-                        Y0[t][c-tx_start] = 1
+                        Y0[t][c - tx_start] = 1
                     # Ignoring junctions outside annotated tx start/end sites
-                     
+
     elif strand == '-':
 
-        X0 = (5-np.asarray(list(map(int, list(seq[::-1]))))) % 5  # Reverse complement
-        Y0 = [-np.ones(tx_end-tx_start+1) for t in range(1)]
+        # Reverse complement
+        X0 = (5 - np.asarray(list(map(int, list(seq[::-1]))))) % 5
+        Y0 = [-np.ones(tx_end - tx_start + 1) for t in range(1)]
 
         for t in range(1):
 
             if len(jn_start[t]) > 0:
-                Y0[t] = np.zeros(tx_end-tx_start+1)
+                Y0[t] = np.zeros(tx_end - tx_start + 1)
                 for c in jn_end[t]:
                     if tx_start <= c <= tx_end:
-                        Y0[t][tx_end-c] = 2
+                        Y0[t][tx_end - c] = 2
                 for c in jn_start[t]:
                     if tx_start <= c <= tx_end:
-                        Y0[t][tx_end-c] = 1
+                        Y0[t][tx_end - c] = 1
 
     Xd, Yd = reformat_data(X0, Y0)
     X, Y = one_hot_encode(Xd, Yd)
@@ -108,19 +132,19 @@ def reformat_data(X0, Y0):
 
     num_points = ceil_div(len(Y0[0]), SL)
 
-    Xd = np.zeros((num_points, SL+CL_max))
+    Xd = np.zeros((num_points, SL + CL_max))
     Yd = [-np.ones((num_points, SL)) for t in range(1)]
 
     X0 = np.pad(X0, [0, SL], 'constant', constant_values=0)
     Y0 = [np.pad(Y0[t], [0, SL], 'constant', constant_values=-1)
-         for t in range(1)]
+          for t in range(1)]
 
     for i in range(num_points):
-        Xd[i] = X0[SL*i:CL_max+SL*(i+1)]
+        Xd[i] = X0[SL * i:CL_max + SL * (i + 1)]
 
     for t in range(1):
         for i in range(num_points):
-            Yd[t][i] = Y0[t][SL*i:SL*(i+1)]
+            Yd[t][i] = Y0[t][SL * i:SL * (i + 1)]
 
     return Xd, Yd
 
@@ -131,11 +155,11 @@ def clip_datapoints(X, Y, CL, N_GPUS):
     # multiple of N_GPUS. Failure to ensure this often results in crashes.
     # (ii) If the required context length is less than CL_max, then
     # appropriate clipping is done below.
-    # Additionally, Y is also converted to a list (the .h5 files store 
+    # Additionally, Y is also converted to a list (the .h5 files store
     # them as an array).
 
-    rem = X.shape[0]%N_GPUS
-    clip = (CL_max-CL)//2
+    rem = X.shape[0] % N_GPUS
+    clip = (CL_max - CL) // 2
 
     if rem != 0 and clip != 0:
         return X[:-rem, clip:-clip], [Y[t][:-rem] for t in range(1)]
@@ -150,7 +174,7 @@ def clip_datapoints(X, Y, CL, N_GPUS):
 def one_hot_encode(Xd, Yd):
 
     return IN_MAP[Xd.astype('int8')], \
-           [OUT_MAP[Yd[t].astype('int8')] for t in range(1)]
+        [OUT_MAP[Yd[t].astype('int8')] for t in range(1)]
 
 
 def print_topl_statistics(y_true, y_pred):
@@ -166,16 +190,16 @@ def print_topl_statistics(y_true, y_pred):
 
     for top_length in [0.5, 1, 2, 4]:
 
-        idx_pred = argsorted_y_pred[-int(top_length*len(idx_true)):]
+        idx_pred = argsorted_y_pred[-int(top_length * len(idx_true)):]
 
-        topkl_accuracy += [np.size(np.intersect1d(idx_true, idx_pred)) \
-                  / float(min(len(idx_pred), len(idx_true)))]
-        threshold += [sorted_y_pred[-int(top_length*len(idx_true))]]
+        topkl_accuracy += [np.size(np.intersect1d(idx_true, idx_pred))
+                           / float(min(len(idx_pred), len(idx_true)))]
+        threshold += [sorted_y_pred[-int(top_length * len(idx_true))]]
 
     auprc = average_precision_score(y_true, y_pred)
 
-    print ("%.4f\t\033[91m%.4f\t\033[0m%.4f\t%.4f\t\033[94m%.4f\t\033[0m"
+    print("%.4f\t\033[91m%.4f\t\033[0m%.4f\t%.4f\t\033[94m%.4f\t\033[0m"
           + "%.4f\t%.4f\t%.4f\t%.4f\t%d") % (
-          topkl_accuracy[0], topkl_accuracy[1], topkl_accuracy[2],
-          topkl_accuracy[3], auprc, threshold[0], threshold[1],
-          threshold[2], threshold[3], len(idx_true))
+        topkl_accuracy[0], topkl_accuracy[1], topkl_accuracy[2],
+        topkl_accuracy[3], auprc, threshold[0], threshold[1],
+        threshold[2], threshold[3], len(idx_true))

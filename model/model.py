@@ -38,7 +38,7 @@ class ResBlock(nn.Module):
         return out
 
 
-class Pangolin(nn.Module):
+class SpliceAI(nn.Module):
     def __init__(self, L, W, AR):
         super(Pangolin, self).__init__()
         self.n_chans = L

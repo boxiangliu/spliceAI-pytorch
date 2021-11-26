@@ -1,0 +1,21 @@
+ROOT: &ROOT /mnt/storage/idl-0/bio/boxiang/spliceAI-pytorch
+DATA:
+  TRAIN: !join [*ROOT, data/dataset_train_all.h5]
+  DEV: !join [*ROOT, data/dataset_test_0.h5]
+MODEL: spliceAI
+PARAMS:
+  LOSS: CE
+  OPTIMIZER:
+    NAME: ADAM
+    LR: 0.001
+    WEIGHT_DECAY: 0.0
+    MOMENTUM: 0.0
+  LOADER:
+    BATCH: 48
+    WORKERS: 8
+  EPOCH: 30
+LOGGING:
+  LOG_EVERY: 50
+  SAVE_EVERY: 200
+  DIR: !join [*ROOT, runs/test/]
+
