@@ -71,7 +71,7 @@ class Trainer(object):
                 logging.StreamHandler()
             ])
 
-        shutil.copyfile(cfg_file, f"{self.cfg.LOGGING.DIR}/config.yaml")
+        shutil.copyfile(self.cfg_file, f"{self.cfg.LOGGING.DIR}/config.yaml")
 
         self.time_stamp = time.time()
 
