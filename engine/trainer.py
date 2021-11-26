@@ -156,7 +156,7 @@ class Trainer(object):
                 "epoch": self.summary["epoch"],
                 "step": self.summary["step"],
                 "state_dict": self.model.state_dict()
-            })
+            }, os.path.join(self.cfg.LOGGING.DIR, 'train.ckpt'))
 
         elif mode == "dev":
             if self.summary["dev_loss"] < self.summary["dev_loss_best"]:
@@ -164,8 +164,8 @@ class Trainer(object):
                     "epoch": self.summary["epoch"],
                     "step": self.summary["step"],
                     "dev_loss_best": self.summary["dev_loss_best"],
-                    "state_dict": self.model.module.state_dict()
-                })
+                    "state_dict": self.model.state_dict()
+                }, os.path.join(self.cfg.LOGGING.DIR, 'best.ckpt'))
 
                 logging.info("BEST, EPOCH: {}, STEP: {}, LOSS: {}, TIME: {:.2f} s".format(
                     self.summary["epoch"],
