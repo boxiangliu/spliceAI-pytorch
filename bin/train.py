@@ -12,6 +12,7 @@ total_steps = cfg.PARAMS.EPOCH * steps_per_epoch
 start_step = trainer.summary["step"]
 
 for step in range(start_step, total_steps):
+    sys.stderr.write("")
     trainer.train_step()
 
     if (step + 1) % cfg.LOGGING.LOG_EVERY == 0:

@@ -104,7 +104,7 @@ class Trainer(object):
         self.summary["log_step"] += 1
         self.summary["save_step"] += 1
 
-    def eval_epoch(self):
+    def dev_epoch(self):
         self.model.eval()
         self.dev_iter = iter(self.dev_loader)
         dev_loss_sum = 0.0
