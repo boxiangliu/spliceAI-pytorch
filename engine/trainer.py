@@ -7,6 +7,8 @@ from model.model import SpliceAI, L, W, AR
 import time
 import logging
 import shutil
+import sys
+
 
 class Trainer(object):
 
@@ -17,8 +19,9 @@ class Trainer(object):
     def initialize(self):
         self.cfg = load_config(self.cfg_file)
 
+        sys.stderr.write("Loading data...\n")
         self.train_data = H5Dataset(self.cfg.DATA.TRAIN)
-        self.dev_data = H5Dataset(self.cfg.DATA.dEV)
+        self.dev_data = H5Dataset(self.cfg.DATA.DEV)
 
         self.train_loader = DataLoader(
             dataset=self.train_data,
