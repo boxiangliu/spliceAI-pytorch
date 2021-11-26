@@ -113,7 +113,6 @@ class Trainer(object):
 
         with torch.no_grad():
             for seqs, labels in self.dev_loader:
-                breakpoint()
                 seqs = seqs.to(self.device)
                 labels = labels.to(self.device)
 
