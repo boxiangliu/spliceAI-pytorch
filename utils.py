@@ -9,7 +9,7 @@ from math import ceil
 from sklearn.metrics import average_precision_score
 from data.constants import *
 import yaml
-from easydict import EDict as edict
+from easydict import EasyDict as edict
 
 assert CL_max % 2 == 0
 
