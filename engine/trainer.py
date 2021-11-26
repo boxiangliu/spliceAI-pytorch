@@ -29,6 +29,9 @@ class Trainer(object):
         self.train_data = H5Dataset(self.cfg.DATA.TRAIN)
         self.dev_data = H5Dataset(self.cfg.DATA.DEV)
 
+        if self.cfg.DEBUG:
+            self.dev_data.num_examples = 100
+
         self.train_loader = DataLoader(
             dataset=self.train_data,
             shuffle=True,
@@ -109,6 +112,7 @@ class Trainer(object):
         dev_loss_sum = 0.0
 
         with torch.no_grad():
+            breakpoint()
             for seqs, labels in self.dev_loader[:5]:
 
                 seqs = seqs.to(self.device)
