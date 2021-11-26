@@ -40,7 +40,7 @@ class ResBlock(nn.Module):
 
 class SpliceAI(nn.Module):
     def __init__(self, L, W, AR):
-        super(Pangolin, self).__init__()
+        super(SpliceAI, self).__init__()
         self.n_chans = L
         self.conv1 = nn.Conv1d(4, L, 1)
         self.skip = nn.Conv1d(L, L, 1)
