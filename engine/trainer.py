@@ -10,6 +10,7 @@ import shutil
 import sys
 import os
 
+
 class Trainer(object):
 
     def __init__(self, cfg_file):
@@ -18,6 +19,11 @@ class Trainer(object):
 
     def initialize(self):
         self.cfg = load_config(self.cfg_file)
+
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+        else:
+            self.device = torch.device("cpu")
 
         sys.stderr.write("Loading data...\n")
         self.train_data = H5Dataset(self.cfg.DATA.TRAIN)
@@ -37,7 +43,7 @@ class Trainer(object):
             num_workers=self.cfg.PARAMS.LOADER.WORKERS)
 
         if self.cfg.MODEL == "spliceAI":
-            self.model = SpliceAI(L, W, AR)
+            self.model = SpliceAI(L, W, AR).to(self.device)
         else:
             raise ValueError(f"{self.cfg.MODEL} not implemented!")
 
@@ -82,6 +88,9 @@ class Trainer(object):
             self.train_iter = iter(self.train_loader)
             seqs, labels = next(self.train_iter)
             self.summary["epoch"] += 1
+
+        seqs = seqs.to(self.device)
+        labels = labels.to(self.device)
 
         outputs = self.model(seqs)
         loss = self.loss_fun(outputs, labels).mean()
@@ -158,4 +167,3 @@ class Trainer(object):
                     self.summary["dev_loss_best"],
                     elapsed_time
                 ))
-
