@@ -155,7 +155,7 @@ class Trainer(object):
             torch.save({
                 "epoch": self.summary["epoch"],
                 "step": self.summary["step"],
-                "state_dict": self.model.module.state_dict()
+                "state_dict": self.model.state_dict()
             })
 
         elif mode == "dev":
