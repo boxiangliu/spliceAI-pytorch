@@ -7,7 +7,7 @@ import numpy as np
 import re
 from math import ceil
 from sklearn.metrics import average_precision_score
-from constants import *
+from data.constants import *
 import yaml
 from easydict import EDict as edict
 
