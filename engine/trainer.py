@@ -83,7 +83,6 @@ class Trainer(object):
             seqs, labels = next(self.train_iter)
             self.summary["epoch"] += 1
 
-        breakpoint()
         outputs = self.model(seqs)
         loss = self.loss_fun(outputs, labels).mean()
 

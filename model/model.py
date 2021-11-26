@@ -52,6 +52,7 @@ class SpliceAI(nn.Module):
         self.conv_last = nn.Conv1d(L, 3, 1)
 
     def forward(self, x):
+        breakpoint()
         conv = self.conv1(x)
         skip = self.skip(conv)
         j = 0
