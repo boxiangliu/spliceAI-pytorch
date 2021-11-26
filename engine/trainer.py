@@ -106,11 +106,10 @@ class Trainer(object):
 
     def dev_epoch(self):
         self.model.eval()
-        self.dev_iter = iter(self.dev_loader)
         dev_loss_sum = 0.0
 
         with torch.no_grad():
-            for seqs, labels in self.dev_iter:
+            for seqs, labels in self.dev_loader[:5]:
 
                 seqs = seqs.to(self.device)
                 labels = labels.to(self.device)
