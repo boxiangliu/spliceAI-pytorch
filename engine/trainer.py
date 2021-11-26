@@ -40,7 +40,7 @@ class Trainer(object):
         self.train_iter = iter(self.train_loader)
 
         self.dev_loader = DataLoader(
-            dataset=self.train_data,
+            dataset=self.dev_data,
             shuffle=False,
             batch_size=self.cfg.PARAMS.LOADER.BATCH,
             num_workers=self.cfg.PARAMS.LOADER.WORKERS)
