@@ -49,8 +49,8 @@ elif int(sys.argv[1]) == 10000:
 
 CL = 2 * np.sum(AR*(W-1))
 assert CL <= CL_max and CL == int(sys.argv[1])
-print "\033[1mContext nucleotides: %d\033[0m" % (CL)
-print "\033[1mSequence length (output): %d\033[0m" % (SL)
+# print "\033[1mContext nucleotides: %d\033[0m" % (CL)
+# print "\033[1mSequence length (output): %d\033[0m" % (SL)
 
 model = SpliceAI(L, W, AR)
 model.summary()
@@ -86,10 +86,10 @@ for epoch_num in range(EPOCH_NUM):
 
 
     if (epoch_num+1) % len(idx_train) == 0:
-        # Printing metrics (see utils.py for details)
+        # # printing metrics (see utils.py for details)
 
-        print "--------------------------------------------------------------"
-        print "\n\033[1mValidation set metrics:\033[0m"
+        # print "--------------------------------------------------------------"
+        # print "\n\033[1mValidation set metrics:\033[0m"
 
         Y_true_1 = [[] for t in range(1)]
         Y_true_2 = [[] for t in range(1)]
@@ -116,17 +116,17 @@ for epoch_num in range(EPOCH_NUM):
                 Y_pred_1[t].extend(Yp[t][is_expr, :, 1].flatten())
                 Y_pred_2[t].extend(Yp[t][is_expr, :, 2].flatten())
 
-        print "\n\033[1mAcceptor:\033[0m"
+        # print "\n\033[1mAcceptor:\033[0m"
         for t in range(1):
-            print_topl_statistics(np.asarray(Y_true_1[t]),
+            # print_topl_statistics(np.asarray(Y_true_1[t]),
                                   np.asarray(Y_pred_1[t]))
 
-        print "\n\033[1mDonor:\033[0m"
+        # print "\n\033[1mDonor:\033[0m"
         for t in range(1):
-            print_topl_statistics(np.asarray(Y_true_2[t]),
+            # print_topl_statistics(np.asarray(Y_true_2[t]),
                                   np.asarray(Y_pred_2[t]))
 
-        print "\n\033[1mTraining set metrics:\033[0m"
+        # print "\n\033[1mTraining set metrics:\033[0m"
 
         Y_true_1 = [[] for t in range(1)]
         Y_true_2 = [[] for t in range(1)]
@@ -153,21 +153,21 @@ for epoch_num in range(EPOCH_NUM):
                 Y_pred_1[t].extend(Yp[t][is_expr, :, 1].flatten())
                 Y_pred_2[t].extend(Yp[t][is_expr, :, 2].flatten())
 
-        print "\n\033[1mAcceptor:\033[0m"
+        # print "\n\033[1mAcceptor:\033[0m"
         for t in range(1):
-            print_topl_statistics(np.asarray(Y_true_1[t]),
+            # print_topl_statistics(np.asarray(Y_true_1[t]),
                                   np.asarray(Y_pred_1[t]))
 
-        print "\n\033[1mDonor:\033[0m"
+        # print "\n\033[1mDonor:\033[0m"
         for t in range(1):
-            print_topl_statistics(np.asarray(Y_true_2[t]),
+            # print_topl_statistics(np.asarray(Y_true_2[t]),
                                   np.asarray(Y_pred_2[t]))
 
-        print "Learning rate: %.5f" % (kb.get_value(model_m.optimizer.lr))
-        print "--- %s seconds ---" % (time.time() - start_time)
+        # print "Learning rate: %.5f" % (kb.get_value(model_m.optimizer.lr))
+        # print "--- %s seconds ---" % (time.time() - start_time)
         start_time = time.time()
 
-        print "--------------------------------------------------------------"
+        # print "--------------------------------------------------------------"
 
         model.save('./Models/SpliceAI' + sys.argv[1]
                    + '_c' + sys.argv[2] + '.h5')
