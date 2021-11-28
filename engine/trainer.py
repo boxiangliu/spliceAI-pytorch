@@ -149,6 +149,7 @@ class Trainer(object):
                 loss = self.loss_fun(outputs, labels).mean(axis=1)
                 acc = self.acc_fun(outputs, labels).mean(axis=1)
                 dev_loss_sum += tensor2numpy(loss.sum())
+                dev_acc_sum += tensor2numpy(acc.sum())
 
         self.summary["dev_loss"] = dev_loss_sum / len(self.dev_data)
         self.summary["dev_acc"] = dev_acc_sum / len(self.dev_data)
