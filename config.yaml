@@ -1,3 +1,6 @@
+METADATA:
+  NAME: first run
+  DESCRIPTION: first run
 ROOT: &ROOT /mnt/storage/idl-0/bio/boxiang/spliceAI-pytorch
 DATA:
   TRAIN: !join [*ROOT, data/dataset_train_all.h5]

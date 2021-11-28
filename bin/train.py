@@ -22,3 +22,5 @@ for step in range(start_step, total_steps):
         trainer.log(mode="dev")
         trainer.save(mode="train")
         trainer.save(mode="dev")
+
+trainer.finish()

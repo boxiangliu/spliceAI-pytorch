@@ -9,6 +9,7 @@ import logging
 import shutil
 import sys
 import os
+import wandb
 
 
 class Trainer(object):
@@ -61,11 +62,12 @@ class Trainer(object):
         if self.cfg.PARAMS.LOSS == "CE":
             self.loss_fun = nn.CrossEntropyLoss(reduction="none")
 
+        self.acc_fun = lambda x, y: x.argmax(dim=1) == y.argmax(dim=1)
+
         self.summary = {
             "epoch": 0,
             "step": 0,
             "log_step": 0,
-            "save_step": 0,
             "train_loss_sum": 0.0,
             "dev_loss": 0.0,
             "dev_loss_best": float("inf")
@@ -82,7 +84,29 @@ class Trainer(object):
 
         shutil.copyfile(self.cfg_file, f"{self.cfg.LOGGING.DIR}/config.yaml")
 
+        wandb.init(
+            project="spliceAI",
+            name=self.cfg.METADATA.NAME,
+            notes=self.cfg.METADATA.DESCRIPTION,
+            config={
+                "train_data": self.cfg.DATA.TRAIN,
+                "dev_data": self.cfg.DATA.DEV,
+                "model": self.cfg.MODEL,
+                "loss": self.PARAMS.LOSS,
+                "optimizer": self.cfg.PARAMS.OPTIMIZER.NAME,
+                "lr": self.cfg.PARAMS.OPTIMIZER.LR,
+                "weight_decay": self.cfg.PARAMS.OPTIMIZER.WEIGHT_DECAY,
+                "momentum": self.cfg.PARAMS.OPTIMIZER.MOMENTUM,
+                "batch_size": self.cfg.PARAMS.LOADER.BATCH,
+                "epoch": self.cfg.PARAMS.OPTIMIZER.EPOCH
+            })
+
         self.time_stamp = time.time()
+
+    def reset_summary(self):
+        self.summary["train_loss_sum"] = 0.0
+        self.summary["train_loss_sum"] = 0.0
+        self.summary["log_step"] = 0
 
     def train_step(self):
         try:
@@ -97,19 +121,21 @@ class Trainer(object):
 
         outputs = self.model(seqs)
         loss = self.loss_fun(outputs, labels).mean()
+        acc = self.acc_fun(outputs, labels).mean()
 
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
 
         self.summary["train_loss_sum"] += tensor2numpy(loss)
+        self.summary["train_acc_sum"] += tensor2numpy(acc)
         self.summary["step"] += 1
         self.summary["log_step"] += 1
-        self.summary["save_step"] += 1
 
     def dev_epoch(self):
         self.model.eval()
         dev_loss_sum = 0.0
+        dev_acc_sum = 0.0
 
         with torch.no_grad():
             for seqs, labels in self.dev_loader:
@@ -118,9 +144,11 @@ class Trainer(object):
 
                 outputs = self.model(seqs)
                 loss = self.loss_fun(outputs, labels).mean(axis=1)
+                acc = self.acc_fun(outputs, labels).mean(axis=1)
                 dev_loss_sum += tensor2numpy(loss.sum())
 
         self.summary["dev_loss"] = dev_loss_sum / len(self.dev_data)
+        self.summary["dev_acc"] = dev_acc_sum / len(self.dev_data)
         self.model.train()
 
     def log(self, mode="train"):
@@ -130,24 +158,35 @@ class Trainer(object):
         if mode == "train":
             train_loss = \
                 self.summary["train_loss_sum"] / self.summary["log_step"]
+            train_acc = \
+                self.summary["train_acc_sum"] / self.summary["log_step"]
 
-            logging.info("TRAIN, EPOCH: {}, STEP: {}, LOSS: {}, TIME: {:.2f} s".format(
+            logging.info("TRAIN, EPOCH: {}, STEP: {}, LOSS: {}, ACC: {}, TIME: {:.2f} s".format(
                 self.summary["epoch"],
                 self.summary["step"],
                 train_loss,
+                train_acc,
                 elapsed_time
             ))
 
-            self.summary["train_loss_sum"] = 0.0
+            wandb.log({"train": {"loss": train_loss
+                                 "acc": train_acc}},
+                      step=self.summary["step"])
+
+            self.reset_summary()
 
         elif mode == "dev":
-            logging.info("DEV, EPOCH: {}, STEP: {}, LOSS: {}, TIME: {:.2f} s".format(
+            logging.info("DEV, EPOCH: {}, STEP: {}, LOSS: {}, ACC: {}, TIME: {:.2f} s".format(
                 self.summary["epoch"],
                 self.summary["step"],
                 self.summary["dev_loss"],
+                self.summary["dev_acc"],
                 elapsed_time
             ))
-            self.summary["dev_loss"] = 0.0
+
+            wandb.log({"dev": {"loss": train_loss
+                               "acc": train_acc}},
+                      step=self.summary["step"])
 
     def save(self, mode="train"):
         if mode == "train":
@@ -172,3 +211,6 @@ class Trainer(object):
                     self.summary["step"],
                     self.summary["dev_loss_best"]
                 ))
+
+    def finish(self):
+        wandb.finish()
