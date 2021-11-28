@@ -169,8 +169,7 @@ class Trainer(object):
                 elapsed_time
             ))
 
-            wandb.log({"train": {"loss": train_loss
-                                 "acc": train_acc}},
+            wandb.log({"train": {"loss": train_loss, "acc": train_acc}},
                       step=self.summary["step"])
 
             self.reset_summary()
@@ -184,8 +183,7 @@ class Trainer(object):
                 elapsed_time
             ))
 
-            wandb.log({"dev": {"loss": train_loss
-                               "acc": train_acc}},
+            wandb.log({"dev": {"loss": train_loss, "acc": train_acc}},
                       step=self.summary["step"])
 
     def save(self, mode="train"):
