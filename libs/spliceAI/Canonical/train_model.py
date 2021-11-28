@@ -86,7 +86,7 @@ for epoch_num in range(EPOCH_NUM):
 
 
     if (epoch_num+1) % len(idx_train) == 0:
-        # # printing metrics (see utils.py for details)
+        # Printing metrics (see utils.py for details)
 
         # print "--------------------------------------------------------------"
         # print "\n\033[1mValidation set metrics:\033[0m"
@@ -118,12 +118,12 @@ for epoch_num in range(EPOCH_NUM):
 
         # print "\n\033[1mAcceptor:\033[0m"
         for t in range(1):
-            # print_topl_statistics(np.asarray(Y_true_1[t]),
+            print_topl_statistics(np.asarray(Y_true_1[t]),
                                   np.asarray(Y_pred_1[t]))
 
         # print "\n\033[1mDonor:\033[0m"
         for t in range(1):
-            # print_topl_statistics(np.asarray(Y_true_2[t]),
+            print_topl_statistics(np.asarray(Y_true_2[t]),
                                   np.asarray(Y_pred_2[t]))
 
         # print "\n\033[1mTraining set metrics:\033[0m"
@@ -155,12 +155,12 @@ for epoch_num in range(EPOCH_NUM):
 
         # print "\n\033[1mAcceptor:\033[0m"
         for t in range(1):
-            # print_topl_statistics(np.asarray(Y_true_1[t]),
+            print_topl_statistics(np.asarray(Y_true_1[t]),
                                   np.asarray(Y_pred_1[t]))
 
         # print "\n\033[1mDonor:\033[0m"
         for t in range(1):
-            # print_topl_statistics(np.asarray(Y_true_2[t]),
+            print_topl_statistics(np.asarray(Y_true_2[t]),
                                   np.asarray(Y_pred_2[t]))
 
         # print "Learning rate: %.5f" % (kb.get_value(model_m.optimizer.lr))
