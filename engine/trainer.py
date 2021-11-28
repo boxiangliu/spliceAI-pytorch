@@ -121,7 +121,6 @@ class Trainer(object):
 
         outputs = self.model(seqs)
         loss = self.loss_fun(outputs, labels).mean()
-        breakpoint()
         acc = self.acc_fun(outputs, labels).mean()
 
         self.optimizer.zero_grad()
