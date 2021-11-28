@@ -62,15 +62,17 @@ class Trainer(object):
         if self.cfg.PARAMS.LOSS == "CE":
             self.loss_fun = nn.CrossEntropyLoss(reduction="none")
 
-        self.acc_fun = lambda x, y: (x.argmax(dim=1) == y.argmax(dim=1)).float()
+        self.acc_fun = lambda x, y: (
+            x.argmax(dim=1) == y.argmax(dim=1)).float()
 
         self.summary = {
             "epoch": 0,
             "step": 0,
             "log_step": 0,
             "train_loss_sum": 0.0,
-            "train_acc_sum": 0.0, 
+            "train_acc_sum": 0.0,
             "dev_loss": 0.0,
+            "dev_acc": 0.0,
             "dev_loss_best": float("inf")
         }
 
@@ -184,7 +186,8 @@ class Trainer(object):
                 elapsed_time
             ))
 
-            wandb.log({"dev": {"loss": train_loss, "acc": train_acc}},
+            wandb.log({"dev": {"loss": self.summary["dev_loss"],
+                               "acc": self.summary["dev_acc"]}},
                       step=self.summary["step"])
 
     def save(self, mode="train"):
