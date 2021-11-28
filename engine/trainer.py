@@ -62,7 +62,7 @@ class Trainer(object):
         if self.cfg.PARAMS.LOSS == "CE":
             self.loss_fun = nn.CrossEntropyLoss(reduction="none")
 
-        self.acc_fun = lambda x, y: x.argmax(dim=1) == y.argmax(dim=1)
+        self.acc_fun = lambda x, y: (x.argmax(dim=1) == y.argmax(dim=1)).float()
 
         self.summary = {
             "epoch": 0,
