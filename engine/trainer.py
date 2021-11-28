@@ -98,7 +98,7 @@ class Trainer(object):
                 "weight_decay": self.cfg.PARAMS.OPTIMIZER.WEIGHT_DECAY,
                 "momentum": self.cfg.PARAMS.OPTIMIZER.MOMENTUM,
                 "batch_size": self.cfg.PARAMS.LOADER.BATCH,
-                "epoch": self.cfg.PARAMS.OPTIMIZER.EPOCH
+                "epoch": self.cfg.PARAMS.EPOCH
             })
 
         self.time_stamp = time.time()
