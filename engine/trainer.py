@@ -69,6 +69,7 @@ class Trainer(object):
             "step": 0,
             "log_step": 0,
             "train_loss_sum": 0.0,
+            "train_acc_sum": 0.0, 
             "dev_loss": 0.0,
             "dev_loss_best": float("inf")
         }
