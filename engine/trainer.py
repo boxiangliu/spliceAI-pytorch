@@ -92,7 +92,7 @@ class Trainer(object):
                 "train_data": self.cfg.DATA.TRAIN,
                 "dev_data": self.cfg.DATA.DEV,
                 "model": self.cfg.MODEL,
-                "loss": self.PARAMS.LOSS,
+                "loss": self.cfg.PARAMS.LOSS,
                 "optimizer": self.cfg.PARAMS.OPTIMIZER.NAME,
                 "lr": self.cfg.PARAMS.OPTIMIZER.LR,
                 "weight_decay": self.cfg.PARAMS.OPTIMIZER.WEIGHT_DECAY,
