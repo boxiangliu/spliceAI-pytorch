@@ -108,7 +108,7 @@ class Trainer(object):
 
     def reset_summary(self):
         self.summary["train_loss_sum"] = 0.0
-        self.summary["train_loss_sum"] = 0.0
+        self.summary["train_acc_sum"] = 0.0
         self.summary["log_step"] = 0
 
     def train_step(self):
