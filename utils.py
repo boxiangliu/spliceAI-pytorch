@@ -178,10 +178,9 @@ def one_hot_encode(Xd, Yd):
         [OUT_MAP[Yd[t].astype('int8')] for t in range(1)]
 
 
-def print_topl_statistics(y_true, y_pred):
+def get_topl_statistics(y_true, y_pred):
     # Prints the following information: top-kL statistics for k=0.5,1,2,4,
     # auprc, thresholds for k=0.5,1,2,4, number of true splice sites.
-
     idx_true = np.nonzero(y_true == 1)[0]
     argsorted_y_pred = np.argsort(y_pred)
     sorted_y_pred = np.sort(y_pred)
@@ -199,8 +198,10 @@ def print_topl_statistics(y_true, y_pred):
 
     auprc = average_precision_score(y_true, y_pred)
 
-    print("%.4f\t\033[91m%.4f\t\033[0m%.4f\t%.4f\t\033[94m%.4f\t\033[0m"
-          + "%.4f\t%.4f\t%.4f\t%.4f\t%d") % (
-        topkl_accuracy[0], topkl_accuracy[1], topkl_accuracy[2],
-        topkl_accuracy[3], auprc, threshold[0], threshold[1],
-        threshold[2], threshold[3], len(idx_true))
+    # print(("%.4f\t\033[91m%.4f\t\033[0m%.4f\t%.4f\t\033[94m%.4f\t\033[0m"
+    #       + "%.4f\t%.4f\t%.4f\t%.4f\t%d") % (
+    #     topkl_accuracy[0], topkl_accuracy[1], topkl_accuracy[2],
+    #     topkl_accuracy[3], auprc, threshold[0], threshold[1],
+    #     threshold[2], threshold[3], len(idx_true)))
+
+    return topl_accuracy, threshold, auprc, len(idx_true)

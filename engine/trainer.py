@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
 from data.dataset import H5Dataset
-from utils import load_config, tensor2numpy
+from utils import load_config, tensor2numpy, get_topl_statistics
 from model.model import SpliceAI, L, W, AR
 import time
 import logging
@@ -62,18 +62,29 @@ class Trainer(object):
         if self.cfg.PARAMS.LOSS == "CE":
             self.loss_fun = nn.CrossEntropyLoss(reduction="none")
 
-        self.acc_fun = lambda x, y: (
-            x.argmax(dim=1) == y.argmax(dim=1)).float()
-
         self.summary = {
             "epoch": 0,
             "step": 0,
             "log_step": 0,
             "train_loss_sum": 0.0,
-            "train_acc_sum": 0.0,
+            "train_topl_acc_1_sum": 0.0,
+            "train_threshold_1_sum": 0.0,
+            "train_auprc_1_sum": 0.0,
+            "train_pos_label_1_sum": 0.0,
+            "train_topl_acc_2_sum": 0.0,
+            "train_threshold_2_sum": 0.0,
+            "train_auprc_2_sum": 0.0,
+            "train_pos_label_2_sum": 0.0,
             "dev_loss": 0.0,
-            "dev_acc": 0.0,
-            "dev_loss_best": float("inf")
+            "dev_loss_best": float("inf"),
+            "dev_topl_acc_1": 0.0,
+            "dev_threshold_1": 0.0,
+            "dev_auprc_1": 0.0,
+            "dev_pos_label_1": 0.0,
+            "dev_topl_acc_2": 0.0,
+            "dev_threshold_2": 0.0,
+            "dev_auprc_2": 0.0,
+            "dev_pos_label_2": 0.0
         }
 
         os.makedirs(self.cfg.LOGGING.DIR, exist_ok=True)
@@ -108,8 +119,30 @@ class Trainer(object):
 
     def reset_summary(self):
         self.summary["train_loss_sum"] = 0.0
-        self.summary["train_acc_sum"] = 0.0
         self.summary["log_step"] = 0
+
+        self.summary["train_topl_acc_1_sum"] = 0.0
+        self.summary["train_threshold_1_sum"] = 0.0
+        self.summary["train_auprc_1_sum"] = 0.0
+        self.summary["train_pos_label_1_sum"] = 0.0
+
+        self.summary["train_topl_acc_2_sum"] = 0.0
+        self.summary["train_threshold_2_sum"] = 0.0
+        self.summary["train_auprc_2_sum"] = 0.0
+        self.summary["train_pos_label_2_sum"] = 0.0
+
+    def stats_fun(self, outputs, labels):
+        is_expr = (labels.sum(axis=(1, 2)) >= 1)
+
+        Y_true_1 = labels[is_expr, :, 1].flatten()
+        Y_true_2 = labels[is_expr, :, 2].flatten()
+        Y_pred_1 = outputs[is_expr, :, 1].flatten()
+        Y_pred_2 = outputs[is_expr, :, 2].flatten()
+
+        stats_1 = get_topl_statistics(Y_true_1, Y_pred_1)
+        stats_2 = get_topl_statistics(Y_true_2, Y_pred_2)
+
+        return stats_1, stats_2
 
     def train_step(self):
         try:
@@ -124,21 +157,39 @@ class Trainer(object):
 
         outputs = self.model(seqs)
         loss = self.loss_fun(outputs, labels).mean()
-        acc = self.acc_fun(outputs, labels).mean()
+        stats = self.stats_fun(outputs, labels)
 
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
 
         self.summary["train_loss_sum"] += tensor2numpy(loss)
-        self.summary["train_acc_sum"] += tensor2numpy(acc)
+
+        for i, stats_i in enumerate(stats):
+            topl_accuracy, threshold, auprc, pos_label = stats_i
+            self.summary[f"train_topl_acc_{i+1}_sum"] += tensor2numpy(topl_accuracy[1])
+            self.summary[f"train_threshold_{i+1}_sum"] += tensor2numpy(threshold[1])
+            self.summary[f"train_auprc_{i+1}_sum"] += tensor2numpy(auprc)
+            self.summary[f"train_pos_label_{i+1}_sum"] += tensor2numpy(pos_label)
+
         self.summary["step"] += 1
         self.summary["log_step"] += 1
 
     def dev_epoch(self):
         self.model.eval()
-        dev_loss_sum = 0.0
-        dev_acc_sum = 0.0
+
+        dev_summary = {
+            "dev_loss_sum": 0.0,
+            "dev_acc_sum": 0.0,
+            "dev_topl_acc_1_sum": 0.0,
+            "dev_threshold_1_sum": 0.0,
+            "dev_auprc_1_sum": 0.0,
+            "dev_pos_label_1_sum": 0.0,
+            "dev_topl_acc_2_sum": 0.0,
+            "dev_threshold_2_sum": 0.0,
+            "dev_auprc_2_sum": 0.0,
+            "dev_pos_label_2_sum": 0.0
+        }
 
         with torch.no_grad():
             for seqs, labels in self.dev_loader:
@@ -147,48 +198,92 @@ class Trainer(object):
 
                 outputs = self.model(seqs)
                 loss = self.loss_fun(outputs, labels).mean(axis=1)
-                acc = self.acc_fun(outputs, labels).mean(axis=1)
-                dev_loss_sum += tensor2numpy(loss.sum())
-                dev_acc_sum += tensor2numpy(acc.sum())
+                stats = self.stats_fun(outputs, labels)
 
-        self.summary["dev_loss"] = dev_loss_sum / len(self.dev_data)
-        self.summary["dev_acc"] = dev_acc_sum / len(self.dev_data)
+                dev_summary["dev_loss_sum"] += tensor2numpy(loss.sum())
+                dev_summary["dev_acc_sum"] += tensor2numpy(acc.sum())
+
+                for i, stats_i in enumerate(stats):
+                    topl_accuracy, threshold, auprc, pos_label = stats[0]
+                    dev_summary[f"dev_topl_acc_{i+1}_sum"] += tensor2numpy(topl_accuracy[1])
+                    dev_summary[f"dev_threshold_{i+1}_sum"] += tensor2numpy(threshold[1])
+                    dev_summary[f"dev_auprc_{i+1}_sum"] += tensor2numpy(auprc)
+                    dev_summary[f"dev_pos_label_{i+1}_sum"] += tensor2numpy(pos_label)
+
+        self.summary["dev_loss"] = dev_summary["dev_loss_sum"] / len(self.dev_data)
+        self.summary["dev_acc"] = dev_summary["dev_acc_sum"] / len(self.dev_data)
+
+        for i in [1, 2]:
+            self.summary[f"dev_topl_acc_{i+1}"] = dev_summary[f"dev_topl_acc_{i+1}_sum"] / len(self.dev_loader)
+            self.summary[f"dev_threshold_{i+1}"] = dev_summary[f"dev_threshold_{i+1}_sum"] / len(self.dev_loader)
+            self.summary[f"dev_auprc_{i+1}"] = dev_summary[f"dev_auprc_{i+1}_sum"] / len(self.dev_loader)
+            self.summary[f"dev_pos_label_{i+1}"] = dev_summary[f"dev_pos_label_{i+1}_sum"] / len(self.dev_loader)
+
         self.model.train()
 
     def log(self, mode="train"):
         elapsed_time = time.time() - self.time_stamp
         self.time_stamp = time.time()
+        log_step = self.summary["log_step"]
 
         if mode == "train":
-            train_loss = \
-                self.summary["train_loss_sum"] / self.summary["log_step"]
-            train_acc = \
-                self.summary["train_acc_sum"] / self.summary["log_step"]
+            train_loss = self.summary["train_loss_sum"] / log_step
 
-            logging.info("TRAIN, EPOCH: {}, STEP: {}, LOSS: {}, ACC: {}, TIME: {:.2f} s".format(
-                self.summary["epoch"],
-                self.summary["step"],
-                train_loss,
-                train_acc,
-                elapsed_time
-            ))
+            train_topl_acc_1 = self.summary["train_topl_acc_1_sum"] / log_step
+            train_threshold_1 = self.summary["train_threshold_1_sum"] / log_step
+            train_auprc_1 = self.summary["train_auprc_1_sum"] / log_step
+            train_pos_label_1 = self.summary["train_pos_label_1_sum"] / log_step
 
-            wandb.log({"train": {"loss": train_loss, "acc": train_acc}},
+            train_topl_acc_2 = self.summary["train_topl_acc_2_sum"] / log_step
+            train_threshold_2 = self.summary["train_threshold_2_sum"] / log_step
+            train_auprc_2 = self.summary["train_auprc_2_sum"] / log_step
+            train_pos_label_2 = self.summary["train_pos_label_2_sum"] / log_step
+
+            logging.info("TRAIN, Epoch: {}, Step: {}, Loss: {}, "
+                         "TopL_1: {}, Threshold_1: {}, AUPRC_1: {}, #Pos_1: {}, "
+                         "TopL_2: {}, Threshold_2: {}, AUPRC_2: {}, #Pos_2: {}, "
+                         "Time: {:.2f} s".format(
+                             self.summary["epoch"], self.summary["step"], train_loss,
+                             train_topl_acc_1, train_threshold_1, train_auprc_1, train_pos_label_1,
+                             train_topl_acc_2, train_threshold_2, train_auprc_2, train_pos_label_2,
+                             elapsed_time
+                         ))
+
+            wandb.log({"train": {"loss": train_loss,
+                                 "topL_1": train_topl_acc_1,
+                                 "threshold_1": train_threshold_1,
+                                 "AUPRC_1": train_auprc_1,
+                                 "#pos_1": train_pos_label_1,
+                                 "topL_2": train_topl_acc_2,
+                                 "threshold_2": train_threshold_2,
+                                 "AUPRC_2": train_auprc_2,
+                                 "#pos_2": train_pos_label_2}},
                       step=self.summary["step"])
 
             self.reset_summary()
 
         elif mode == "dev":
-            logging.info("DEV, EPOCH: {}, STEP: {}, LOSS: {}, ACC: {}, TIME: {:.2f} s".format(
-                self.summary["epoch"],
-                self.summary["step"],
-                self.summary["dev_loss"],
-                self.summary["dev_acc"],
-                elapsed_time
-            ))
+            logging.info("DEV, EPOCH: {}, STEP: {}, LOSS: {}, "
+                         "TopL_1: {}, Threshold_1: {}, AUPRC_1: {}, #Pos_1: {}, "
+                         "TopL_2: {}, Threshold_2: {}, AUPRC_2: {}, #Pos_2: {}, "
+                         "TIME: {:.2f} s".format(
+                             self.summary["epoch"], self.summary["step"], self.summary["dev_loss"],
+                             self.summary["dev_topl_acc_1"], self.summary["dev_threshold_1"],
+                             self.summary["dev_auprc_1"], self.summary["dev_pos_label_1"],
+                             self.summary["dev_topl_acc_2"], self.summary["dev_threshold_2"],
+                             self.summary["dev_auprc_2"], self.summary["dev_pos_label_2"],
+                             elapsed_time
+                         ))
 
             wandb.log({"dev": {"loss": self.summary["dev_loss"],
-                               "acc": self.summary["dev_acc"]}},
+                               "topL_1": self.summary["dev_topl_acc_1"],
+                               "threshold_1": self.summary["dev_threshold_1"],
+                               "AUPRC_1": self.summary["dev_auprc_1"],
+                               "#pos_1": self.summary["dev_pos_label_1"],
+                               "topL_2": self.summary["dev_topl_acc_2"],
+                               "threshold_2": self.summary["dev_threshold_2"],
+                               "AUPRC_2": self.summary["dev_auprc_2"],
+                               "#pos_2": self.summary["dev_pos_label_2"]}},
                       step=self.summary["step"])
 
     def save(self, mode="train"):
