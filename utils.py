@@ -208,4 +208,4 @@ def get_topl_statistics(y_true, y_pred):
     #     topkl_accuracy[3], auprc, threshold[0], threshold[1],
     #     threshold[2], threshold[3], len(idx_true)))
 
-    return topl_accuracy, threshold, auprc, len(idx_true)
+    return topkl_accuracy, threshold, auprc, len(idx_true)
