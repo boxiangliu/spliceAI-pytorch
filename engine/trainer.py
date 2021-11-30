@@ -211,10 +211,10 @@ class Trainer(object):
         self.summary["dev_loss"] = dev_summary["dev_loss_sum"] / len(self.dev_data)
 
         for i in [1, 2]:
-            self.summary[f"dev_topl_acc_{i+1}"] = dev_summary[f"dev_topl_acc_{i+1}_sum"] / len(self.dev_loader)
-            self.summary[f"dev_threshold_{i+1}"] = dev_summary[f"dev_threshold_{i+1}_sum"] / len(self.dev_loader)
-            self.summary[f"dev_auprc_{i+1}"] = dev_summary[f"dev_auprc_{i+1}_sum"] / len(self.dev_loader)
-            self.summary[f"dev_pos_label_{i+1}"] = dev_summary[f"dev_pos_label_{i+1}_sum"] / len(self.dev_loader)
+            self.summary[f"dev_topl_acc_{i}"] = dev_summary[f"dev_topl_acc_{i}_sum"] / len(self.dev_loader)
+            self.summary[f"dev_threshold_{i}"] = dev_summary[f"dev_threshold_{i}_sum"] / len(self.dev_loader)
+            self.summary[f"dev_auprc_{i}"] = dev_summary[f"dev_auprc_{i}_sum"] / len(self.dev_loader)
+            self.summary[f"dev_pos_label_{i}"] = dev_summary[f"dev_pos_label_{i}_sum"] / len(self.dev_loader)
 
         self.model.train()
 
