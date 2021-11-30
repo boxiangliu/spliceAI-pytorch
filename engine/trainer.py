@@ -167,10 +167,10 @@ class Trainer(object):
 
         for i, stats_i in enumerate(stats):
             topl_accuracy, threshold, auprc, pos_label = stats_i
-            self.summary[f"train_topl_acc_{i+1}_sum"] += tensor2numpy(topl_accuracy[1])
-            self.summary[f"train_threshold_{i+1}_sum"] += tensor2numpy(threshold[1])
-            self.summary[f"train_auprc_{i+1}_sum"] += tensor2numpy(auprc)
-            self.summary[f"train_pos_label_{i+1}_sum"] += tensor2numpy(pos_label)
+            self.summary[f"train_topl_acc_{i+1}_sum"] += topl_accuracy[1]
+            self.summary[f"train_threshold_{i+1}_sum"] += threshold[1]
+            self.summary[f"train_auprc_{i+1}_sum"] += auprc
+            self.summary[f"train_pos_label_{i+1}_sum"] += pos_label
 
         self.summary["step"] += 1
         self.summary["log_step"] += 1
@@ -180,7 +180,6 @@ class Trainer(object):
 
         dev_summary = {
             "dev_loss_sum": 0.0,
-            "dev_acc_sum": 0.0,
             "dev_topl_acc_1_sum": 0.0,
             "dev_threshold_1_sum": 0.0,
             "dev_auprc_1_sum": 0.0,
@@ -201,17 +200,15 @@ class Trainer(object):
                 stats = self.stats_fun(outputs, labels)
 
                 dev_summary["dev_loss_sum"] += tensor2numpy(loss.sum())
-                dev_summary["dev_acc_sum"] += tensor2numpy(acc.sum())
 
                 for i, stats_i in enumerate(stats):
                     topl_accuracy, threshold, auprc, pos_label = stats[0]
-                    dev_summary[f"dev_topl_acc_{i+1}_sum"] += tensor2numpy(topl_accuracy[1])
-                    dev_summary[f"dev_threshold_{i+1}_sum"] += tensor2numpy(threshold[1])
-                    dev_summary[f"dev_auprc_{i+1}_sum"] += tensor2numpy(auprc)
-                    dev_summary[f"dev_pos_label_{i+1}_sum"] += tensor2numpy(pos_label)
+                    dev_summary[f"dev_topl_acc_{i+1}_sum"] += topl_accuracy[1]
+                    dev_summary[f"dev_threshold_{i+1}_sum"] += threshold[1]
+                    dev_summary[f"dev_auprc_{i+1}_sum"] += auprc
+                    dev_summary[f"dev_pos_label_{i+1}_sum"] += pos_label
 
         self.summary["dev_loss"] = dev_summary["dev_loss_sum"] / len(self.dev_data)
-        self.summary["dev_acc"] = dev_summary["dev_acc_sum"] / len(self.dev_data)
 
         for i in [1, 2]:
             self.summary[f"dev_topl_acc_{i+1}"] = dev_summary[f"dev_topl_acc_{i+1}_sum"] / len(self.dev_loader)
