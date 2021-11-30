@@ -134,10 +134,10 @@ class Trainer(object):
     def stats_fun(self, outputs, labels):
         is_expr = (labels.sum(axis=(1, 2)) >= 1)
 
-        Y_true_1 = labels[is_expr, :, 1].flatten()
-        Y_true_2 = labels[is_expr, :, 2].flatten()
-        Y_pred_1 = outputs[is_expr, :, 1].flatten()
-        Y_pred_2 = outputs[is_expr, :, 2].flatten()
+        Y_true_1 = labels[is_expr, 1, :].flatten()
+        Y_true_2 = labels[is_expr, 2, :].flatten()
+        Y_pred_1 = outputs[is_expr, 1, :].flatten()
+        Y_pred_2 = outputs[is_expr, 2, :].flatten()
 
         stats_1 = get_topl_statistics(Y_true_1, Y_pred_1, is_expr, outputs, labels)
         stats_2 = get_topl_statistics(Y_true_2, Y_pred_2, is_expr, outputs, labels)
