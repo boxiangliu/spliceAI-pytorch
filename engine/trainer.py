@@ -236,9 +236,9 @@ class Trainer(object):
             train_auprc_2 = self.summary["train_auprc_2_sum"] / log_step
             train_pos_label_2 = self.summary["train_pos_label_2_sum"] / log_step
 
-            logging.info("TRAIN, Epoch: {}, Step: {}, Loss: {}, "
-                         "TopL_1: {}, Threshold_1: {}, AUPRC_1: {}, #Pos_1: {}, "
-                         "TopL_2: {}, Threshold_2: {}, AUPRC_2: {}, #Pos_2: {}, "
+            logging.info("TRAIN, Epoch: {}, Step: {}, Loss: {:.3f} \n"
+                         "TopL_1: {:.3e}, Threshold_1: {:.3e}, AUPRC_1: {:.3e}, #Pos_1: {} \n"
+                         "TopL_2: {:.3e}, Threshold_2: {:.3e}, AUPRC_2: {:.3e}, #Pos_2: {}, "
                          "Time: {:.2f} s".format(
                              self.summary["epoch"], self.summary["step"], train_loss,
                              train_topl_acc_1, train_threshold_1, train_auprc_1, train_pos_label_1,
@@ -260,9 +260,9 @@ class Trainer(object):
             self.reset_summary()
 
         elif mode == "dev":
-            logging.info("DEV, EPOCH: {}, STEP: {}, LOSS: {}, "
-                         "TopL_1: {}, Threshold_1: {}, AUPRC_1: {}, #Pos_1: {}, "
-                         "TopL_2: {}, Threshold_2: {}, AUPRC_2: {}, #Pos_2: {}, "
+            logging.info("DEV, EPOCH: {}, STEP: {}, LOSS: {:.3f} \n"
+                         "TopL_1: {:.3e}, Threshold_1: {:.3e}, AUPRC_1: {:.3e}, #Pos_1: {} \n"
+                         "TopL_2: {:.3e}, Threshold_2: {:.3e}, AUPRC_2: {:.3e}, #Pos_2: {} \n"
                          "TIME: {:.2f} s".format(
                              self.summary["epoch"], self.summary["step"], self.summary["dev_loss"],
                              self.summary["dev_topl_acc_1"], self.summary["dev_threshold_1"],
