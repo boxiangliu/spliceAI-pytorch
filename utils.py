@@ -178,7 +178,7 @@ def one_hot_encode(Xd, Yd):
         [OUT_MAP[Yd[t].astype('int8')] for t in range(1)]
 
 
-def get_topl_statistics(y_true, y_pred):
+def get_topl_statistics(y_true, y_pred, *args):
     # Prints the following information: top-kL statistics for k=0.5,1,2,4,
     # auprc, thresholds for k=0.5,1,2,4, number of true splice sites.
     y_true, y_pred = tensor2numpy(y_true), tensor2numpy(y_pred)
