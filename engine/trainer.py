@@ -236,14 +236,12 @@ class Trainer(object):
             train_auprc_2 = self.summary["train_auprc_2_sum"] / log_step
             train_pos_label_2 = self.summary["train_pos_label_2_sum"] / log_step
 
-            logging.info("TRAIN, Epoch: {}, Step: {}, Loss: {:.3f} \n"
+            logging.info("TRAIN, Epoch: {}, Step: {}, Loss: {:.3f} Time: {:.2f} s \n"
                          "TopL_1: {:.3e}, Threshold_1: {:.3e}, AUPRC_1: {:.3e}, #Pos_1: {} \n"
-                         "TopL_2: {:.3e}, Threshold_2: {:.3e}, AUPRC_2: {:.3e}, #Pos_2: {}, "
-                         "Time: {:.2f} s".format(
-                             self.summary["epoch"], self.summary["step"], train_loss,
+                         "TopL_2: {:.3e}, Threshold_2: {:.3e}, AUPRC_2: {:.3e}, #Pos_2: {}".format(
+                             self.summary["epoch"], self.summary["step"], train_loss, elapsed_time,
                              train_topl_acc_1, train_threshold_1, train_auprc_1, train_pos_label_1,
-                             train_topl_acc_2, train_threshold_2, train_auprc_2, train_pos_label_2,
-                             elapsed_time
+                             train_topl_acc_2, train_threshold_2, train_auprc_2, train_pos_label_2
                          ))
 
             wandb.log({"train": {"loss": train_loss,
@@ -260,16 +258,15 @@ class Trainer(object):
             self.reset_summary()
 
         elif mode == "dev":
-            logging.info("DEV, EPOCH: {}, STEP: {}, LOSS: {:.3f} \n"
+            logging.info("DEV, EPOCH: {}, STEP: {}, LOSS: {:.3f} TIME: {:.2f} s \n"
                          "TopL_1: {:.3e}, Threshold_1: {:.3e}, AUPRC_1: {:.3e}, #Pos_1: {} \n"
-                         "TopL_2: {:.3e}, Threshold_2: {:.3e}, AUPRC_2: {:.3e}, #Pos_2: {} \n"
-                         "TIME: {:.2f} s".format(
-                             self.summary["epoch"], self.summary["step"], self.summary["dev_loss"],
+                         "TopL_2: {:.3e}, Threshold_2: {:.3e}, AUPRC_2: {:.3e}, #Pos_2: {}".format(
+                             self.summary["epoch"], self.summary["step"], self.summary["dev_loss"], 
+                             elapsed_time, 
                              self.summary["dev_topl_acc_1"], self.summary["dev_threshold_1"],
                              self.summary["dev_auprc_1"], self.summary["dev_pos_label_1"],
                              self.summary["dev_topl_acc_2"], self.summary["dev_threshold_2"],
-                             self.summary["dev_auprc_2"], self.summary["dev_pos_label_2"],
-                             elapsed_time
+                             self.summary["dev_auprc_2"], self.summary["dev_pos_label_2"]
                          ))
 
             wandb.log({"dev": {"loss": self.summary["dev_loss"],
