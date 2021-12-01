@@ -14,11 +14,13 @@ AR = np.asarray([1, 1, 1, 1, 4, 4, 4, 4,
 
 
 class ResBlock(nn.Module):
+
     def __init__(self, L, W, AR, pad=True):
         super(ResBlock, self).__init__()
         self.bn1 = nn.BatchNorm1d(L)
         s = 1
-        # padding calculation: https://discuss.pytorch.org/t/how-to-keep-the-shape-of-input-and-output-same-when-dilation-conv/14338/2
+        # padding calculation:
+        # https://discuss.pytorch.org/t/how-to-keep-the-shape-of-input-and-output-same-when-dilation-conv/14338/2
         if pad:
             padding = int(1 / 2 * (1 - L + AR * (W - 1) - s + L * s))
         else:
@@ -39,6 +41,7 @@ class ResBlock(nn.Module):
 
 
 class SpliceAI(nn.Module):
+
     def __init__(self, L, W, AR):
         super(SpliceAI, self).__init__()
         self.n_chans = L
@@ -52,6 +55,7 @@ class SpliceAI(nn.Module):
         self.conv_last = nn.Conv1d(L, 3, 1)
 
     def forward(self, x):
+
         conv = self.conv1(x)
         skip = self.skip(conv)
         j = 0
@@ -63,7 +67,6 @@ class SpliceAI(nn.Module):
                 skip = skip + dense
         CL = 2 * np.sum(AR * (W - 1))
         skip = F.pad(skip, (-CL // 2, -CL // 2))
-        out = F.softmax(self.conv_last(skip), dim=1)
+        # out = F.softmax(self.conv_last(skip), dim=1)
+        out = self.conv_last(skip)
         return out
-
-
