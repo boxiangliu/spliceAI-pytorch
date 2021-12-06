@@ -1,6 +1,6 @@
 # Pytorch implementation of spliceAI
 
-Under construction
+This is a pytorch implementation of [spliceAI](https://github.com/Illumina/SpliceAI) ([paper](https://www.cell.com/cell/pdf/S0092-8674(18)31629-5.pdf))
 
 ### Update the `data/constant.py` file
 `ref_genome` should point to the hg19 genome.fa file

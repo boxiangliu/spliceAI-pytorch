@@ -7,7 +7,7 @@ y_true = F.one_hot(y_true, num_classes=3).transpose(2, 1).float()
 y_pred = torch.randn(size=(48, 3, 5000))
 y_norm = F.softmax(y_pred, dim=1)
 
-F.cross_entropy(y_pred, y_true, reduction="none")
+F.cross_entropy(y_pred, y_true, reduction="none").mean()
 F.cross_entropy(y_pred, y_norm)
 
 

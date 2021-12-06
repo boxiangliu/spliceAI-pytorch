@@ -22,3 +22,5 @@ LOGGING:
   SAVE_EVERY: 4
   DIR: !join [*ROOT, runs/test/]
 DEBUG: True
+ANAYSIS:
+  GTEX: /mnt/storage/idl-0/bio/boxiang/shared/data/GTEx_v8/
