@@ -1,1 +1,8 @@
 .DS_Store
+__pycache__/
+data/canonical_sequence.txt
+data/datafile_test_0.h5
+data/datafile_train_all.h5
+data/dataset_test_0.h5
+data/dataset_train_all.h5
+wandb/
