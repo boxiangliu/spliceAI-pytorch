@@ -12,5 +12,5 @@ ref_genome='/mnt/storage/idl-0/bio/boxiang/shared/data/genomes/Homo_sapiens/UCSC
 # Input details
 
 data_dir='data/'
-sequence='canonical_sequence.txt'
+sequence='data/canonical_sequence.txt'
 # Output details
